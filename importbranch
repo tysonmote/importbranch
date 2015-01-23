@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e
+
+if [ -z "$2" ]; then
+  echo "usage: $0 <project name> <project git URL>"
+  exit 1
+fi
+
+git remote add $1 $2
+git fetch $1
+git branch $1 $1/master
+git checkout $1
+mkdir $1/
+git ls-tree -z --name-only HEAD | xargs -0 -I {} git mv {} $1/
+git commit -m "Moved files to $1/"
+git checkout master
+git merge $1
+git branch -D $1
+git remote remove $1
+
